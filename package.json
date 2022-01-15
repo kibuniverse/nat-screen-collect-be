@@ -20,6 +20,7 @@
     "express-static-gzip": "^2.1.1",
     "fs": "^0.0.1-security",
     "path": "^0.12.7",
+    "stream": "^0.0.2",
     "zip-dir": "^2.0.0"
   }
 }

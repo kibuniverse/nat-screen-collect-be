@@ -3,15 +3,23 @@ const cors = require("cors");
 const formidableMiddleware = require("express-formidable");
 const zipdir = require("zip-dir");
 const fs = require("fs");
-const path = require("path");
+const { Readable } = require("stream");
+
+const constant = require("./constant");
+const classStudentCountMap = constant.classStudentCountMap;
+
+const config = require("./config");
+const port = config.port;
+const filePath = config.filePath;
+const zipFilePath = config.zipFilePath;
 
 const app = express();
-console.log(path.join(__dirname, "public"));
+
 app.use(formidableMiddleware());
 app.use(cors());
 
 app.post("/api/upload", (req, res) => {
-  const dateDirName = req.fields.date.replace(",", "-");
+  const dateDirName = filePath + req.fields.date.replace(",", "-");
   if (!fs.existsSync(dateDirName)) {
     fs.mkdirSync(dateDirName);
   }
@@ -30,15 +38,47 @@ app.post("/api/upload", (req, res) => {
   res.end();
 });
 
-app.get("/download", (req, res) => {
+app.get("/download", async (req, res) => {
   const date = req.query.date;
-  const classes = req.query.class;
-  const downloadDir = `./${date}/${classes}`;
-  const buffer = zipdir(downloadDir, { saveTo: `./${date}${classes}.zip` });
-  res.send("ss");
-  res.end;
+  const classes = req.query.classes;
+  const downloadDir = filePath + `${date}/${classes}`;
+  const buffer = await zipdir(downloadDir);
+  res.writeHead(200, {
+    "Content-Type": "application/zip",
+  });
+  const stream = Readable.from(buffer);
+  stream.pipe(res);
 });
 
-const port = 3000;
+app.get("/api/uploadedDate", (req, res) => {
+  const dateDir = fs.readdirSync(filePath);
+  res.send(JSON.stringify(dateDir));
+  res.end();
+});
 
-app.listen(port, () => {});
+app.get("/api/classResult", (req, res) => {
+  const date = req.query.date;
+  const classes = req.query.classes;
+  const classDir = filePath + `${date}/${classes}`;
+  if (!fs.existsSync(classDir)) {
+    res.send(config.response.fail({}, "未查询到本班今日采集图片"));
+  }
+  const classDirInfo = fs.readdirSync(classDir);
+  const classDirInfoLength = classDirInfo.length;
+  const classStudentCount = classStudentCountMap.get(classes);
+
+  const percent = Math.floor((classDirInfoLength / classStudentCount) * 100);
+  const data = {
+    studentCount: classStudentCount,
+    uploadStudentCount: classDirInfoLength,
+    uploadUserList: classDirInfo,
+    percent,
+  };
+
+  res.send(config.response.success(data, "success"));
+  res.end();
+});
+
+app.listen(port, () => {
+  console.log("服务启动在" + port + "端口");
+});
