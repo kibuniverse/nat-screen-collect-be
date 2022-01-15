@@ -11,7 +11,6 @@ app.use(formidableMiddleware());
 app.use(cors());
 
 app.post("/api/upload", (req, res) => {
-  console.log(req.fields);
   const dateDirName = req.fields.date.replace(",", "-");
   if (!fs.existsSync(dateDirName)) {
     fs.mkdirSync(dateDirName);
@@ -25,7 +24,6 @@ app.post("/api/upload", (req, res) => {
   const imgExtType = req.files.file.name.split(".").pop();
   const fileName = `${classDirName}/${className}${req.fields.name}.${imgExtType}`;
   const file = req.files.file;
-  console.log(fileName);
   const fs1 = fs.readFileSync(file.path);
   fs.writeFileSync(fileName, fs1);
   res.send(JSON.stringify({ success: 1 }));
@@ -35,7 +33,6 @@ app.post("/api/upload", (req, res) => {
 app.get("/download", (req, res) => {
   const date = req.query.date;
   const classes = req.query.class;
-  console.log(`/${date}/${classes}`);
   const downloadDir = `./${date}/${classes}`;
   const buffer = zipdir(downloadDir, { saveTo: `./${date}${classes}.zip` });
   res.send("ss");
@@ -44,6 +41,4 @@ app.get("/download", (req, res) => {
 
 const port = 3000;
 
-app.listen(port, () => {
-  console.log(`服务启动在${port}`);
-});
+app.listen(port, () => {});
