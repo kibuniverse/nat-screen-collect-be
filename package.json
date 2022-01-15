@@ -16,7 +16,9 @@
     "esbuild": "^0.14.11",
     "express": "^4.17.2",
     "express-formidable": "^1.2.0",
+    "express-static-gzip": "^2.1.1",
     "fs": "^0.0.1-security",
+    "path": "^0.12.7",
     "zip-dir": "^2.0.0"
   }
 }

@@ -3,9 +3,10 @@ const cors = require("cors");
 const formidableMiddleware = require("express-formidable");
 const zipdir = require("zip-dir");
 const fs = require("fs");
+const path = require("path");
 
 const app = express();
-
+app.use("static", express.static(path.join(__dirname, "1-14")));
 app.use(formidableMiddleware());
 app.use(cors());
 
@@ -42,6 +43,7 @@ app.get("/download", (req, res) => {
 });
 
 const port = 3000;
+
 app.listen(port, () => {
   console.log(`服务启动在${port}`);
 });
