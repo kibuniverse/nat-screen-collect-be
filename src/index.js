@@ -6,7 +6,7 @@ const fs = require("fs");
 const path = require("path");
 
 const app = express();
-app.use("static", express.static(path.join(__dirname, "1-14")));
+console.log(path.join(__dirname, "public"));
 app.use(formidableMiddleware());
 app.use(cors());
 
