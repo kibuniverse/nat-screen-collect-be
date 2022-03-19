@@ -41,7 +41,7 @@ app.post("/api/upload", (req, res) => {
   res.end();
 });
 
-app.get("/download", async (req, res) => {
+app.get("/api/download", async (req, res) => {
   const date = req.query.date;
   const classes = req.query.classes;
   const downloadDir = filePath + `${date}/${classes}`;
